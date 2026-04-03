@@ -1,0 +1,359 @@
+--- 1. SENSITIVITY ANALYSIS ---
+
+======================================================================
+[INFO] SENSITIVITY ANALYSIS - Testing Feature Impact on Risk Scores
+======================================================================
+
+[TEMP] Temperature Sensitivity (rainfall=25mm, baseline)
+[OK] Risk model loaded from G:\gigshield phase 2 Static ML\gigshield-ai\config\..\models\risk_model.pkl
+[INFO] Risk Model expects: ['Temperature', 'Rainfall_mm', 'Humidity', 'Wind_Speed', 'Severity']
+[OK] Risk Model: score=0.0130, conf=0.8906, factors=['Normal conditions']
+  Temp 10°C → Risk: 0.0130
+[OK] Risk Model: score=0.0130, conf=0.8906, factors=['Normal conditions']
+  Temp 20°C → Risk: 0.0130
+[OK] Risk Model: score=0.1325, conf=0.4737, factors=['Normal conditions']
+  Temp 30°C → Risk: 0.1325
+[OK] Risk Model: score=0.2088, conf=0.3815, factors=['High temperature']
+  Temp 40°C → Risk: 0.2088
+[OK] Risk Model: score=0.2770, conf=0.1937, factors=['Extreme heat']
+  Temp 50°C → Risk: 0.2770
+
+[RAIN] Rainfall Sensitivity (temperature=35°C, baseline)
+[OK] Risk Model: score=0.1682, conf=0.4187, factors=['Normal conditions']
+  Rain   0mm → Risk: 0.1682
+[OK] Risk Model: score=0.2695, conf=0.3718, factors=['Normal conditions']
+  Rain  50mm → Risk: 0.2695
+[OK] Risk Model: score=0.4059, conf=0.2023, factors=['Moderate rainfall', 'Moderate winds']
+  Rain 100mm → Risk: 0.4059
+[OK] Risk Model: score=0.4235, conf=0.1848, factors=['Heavy rainfall', 'Strong winds']
+  Rain 150mm → Risk: 0.4235
+[OK] Risk Model: score=0.4441, conf=0.2160, factors=['Heavy rainfall', 'Strong winds']
+  Rain 200mm → Risk: 0.4441
+
+[CHART] Range Utilization Check
+
+  Risk prediction range (0-1 scale): [0.0130, 0.4441]
+  Range utilized: 0.4311 (43.1% of full)
+  [OK] Good range utilization (using >30% of available range)
+SENSITIVITY RESULT:  {
+  "temperature_sensitivity": {
+    "min_score": 0.013,
+    "max_score": 0.277,
+    "range": 0.264,
+    "sensitivity_per_10C": 0.066
+  },
+  "rainfall_sensitivity": {
+    "min_score": 0.1682,
+    "max_score": 0.4441,
+    "range": 0.27590000000000003,
+    "sensitivity_per_100mm": 0.138
+  },
+  "impact_ranking": {
+    "temperature_impact_per_unit": 0.00165,
+    "rainfall_impact_per_unit": 0.00069,
+    "most_impactful": "Temperature",
+    "temperature_is_stronger": true
+  },
+  "range_utilization": {
+    "overall_min": 0.013,
+    "overall_max": 0.4441,
+    "range_used": 0.4311,
+    "range_percentage": 43.1,
+    "full_range_utilization": true
+  }
+}
+
+--- 2. PROBABILITY DISTRIBUTION CHECK ---
+
+======================================================================
+[INFO] MODEL OUTPUT RANGE ANALYSIS
+======================================================================
+
+[TEST] Testing 64 weather combinations...
+[OK] Risk Model: score=0.0586, conf=0.6711, factors=['Normal conditions']
+[OK] Risk Model: score=0.0762, conf=0.6116, factors=['Normal conditions']
+[OK] Risk Model: score=0.1808, conf=0.4044, factors=['Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.2060, conf=0.3832, factors=['Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.2265, conf=0.3731, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.2209, conf=0.3753, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.2209, conf=0.3753, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.2209, conf=0.3753, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.0735, conf=0.6199, factors=['Normal conditions']
+[OK] Risk Model: score=0.0762, conf=0.6116, factors=['Normal conditions']
+[OK] Risk Model: score=0.1808, conf=0.4044, factors=['Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.2060, conf=0.3832, factors=['Moderate rainfall', 'High humidity', 'Moderate winds']
+[OK] Risk Model: score=0.2265, conf=0.3731, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.2209, conf=0.3753, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.2209, conf=0.3753, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.2209, conf=0.3753, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.0586, conf=0.6711, factors=['Normal conditions']
+[OK] Risk Model: score=0.0762, conf=0.6116, factors=['Normal conditions']
+[OK] Risk Model: score=0.1824, conf=0.4028, factors=['Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.2229, conf=0.3744, factors=['Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.2316, conf=0.3715, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.2292, conf=0.3722, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.2292, conf=0.3722, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.2292, conf=0.3722, factors=['Heavy rainfall', 'High humidity', 'Strong winds']
+[OK] Risk Model: score=0.0975, conf=0.5510, factors=['Normal conditions']
+[OK] Risk Model: score=0.1084, conf=0.5242, factors=['Normal conditions']
+[OK] Risk Model: score=0.2058, conf=0.3833, factors=['Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.2318, conf=0.3715, factors=['Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.2333, conf=0.3711, factors=['Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.2333, conf=0.3711, factors=['Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.2333, conf=0.3711, factors=['Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.2333, conf=0.3711, factors=['Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.0897, conf=0.5717, factors=['Normal conditions']
+[OK] Risk Model: score=0.1692, conf=0.4174, factors=['Normal conditions']
+[OK] Risk Model: score=0.2302, conf=0.3719, factors=['Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.2806, conf=0.3759, factors=['Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.3691, conf=0.1657, factors=['Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.3324, conf=0.1487, factors=['Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.3324, conf=0.1487, factors=['Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.3324, conf=0.1487, factors=['Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.1860, conf=0.3992, factors=['High temperature']
+[OK] Risk Model: score=0.2079, conf=0.3820, factors=['High temperature']
+[OK] Risk Model: score=0.2849, conf=0.3780, factors=['High temperature', 'Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.3515, conf=0.4463, factors=['High temperature', 'Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.5134, conf=0.3678, factors=['High temperature', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.5630, conf=0.6552, factors=['High temperature', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.5640, conf=0.6518, factors=['High temperature', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.5616, conf=0.6604, factors=['High temperature', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.2558, conf=0.2007, factors=['Extreme heat']
+[OK] Risk Model: score=0.2338, conf=0.3710, factors=['Extreme heat']
+[OK] Risk Model: score=0.4131, conf=0.2119, factors=['Extreme heat', 'Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.5662, conf=0.6441, factors=['Extreme heat', 'Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.5780, conf=0.6057, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.7540, conf=0.3692, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.9873, conf=0.8926, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=1.0000, conf=1.0000, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.2561, conf=0.2004, factors=['Extreme heat']
+[OK] Risk Model: score=0.2331, conf=0.3712, factors=['Extreme heat']
+[OK] Risk Model: score=0.4637, conf=0.3781, factors=['Extreme heat', 'Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.5780, conf=0.6057, factors=['Extreme heat', 'Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.8796, conf=0.4975, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=1.0000, conf=1.0000, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=1.0000, conf=1.0000, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=1.0000, conf=1.0000, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+
+Coverage across 64 conditions:
+  Min: 0.0586
+  Max: 1.0000
+  Mean: 0.3350
+  Std Dev: 0.2527
+  Range spread: 0.9414
+COVERAGE RESULT:  {
+  "total_predictions": 64,
+  "min_score": 0.0586,
+  "max_score": 1.0,
+  "mean_score": 0.335,
+  "median_score": 0.2317,
+  "std_dev": 0.2527,
+  "percentiles": {
+    "p10": 0.092,
+    "p25": 0.206,
+    "p50": 0.2317,
+    "p75": 0.3801,
+    "p90": 0.7012
+  }
+}
+
+--- 3. CONFIDENCE DISTRIBUTION & VALIDATION RESULTS ---
+
+======================================================================
+[TEST] STARTING COMPREHENSIVE MODEL VALIDATION
+======================================================================
+
+[INFO] Testing Risk Model (25 cases)...
+[OK] Risk Model: score=0.0735, conf=0.6199, factors=['Normal conditions']
+[OK] Risk Model: score=0.0130, conf=0.8906, factors=['Normal conditions']
+[OK] Risk Model: score=0.0130, conf=0.8906, factors=['Normal conditions']
+[OK] Risk Model: score=0.2029, conf=0.3853, factors=['Normal conditions']
+[OK] Risk Model: score=0.2971, conf=0.3853, factors=['High temperature']
+  ✓ Case  5: temp= 40°C, rain= 50mm → score=0.2971
+[OK] Risk Model: score=0.5855, conf=0.5835, factors=['Extreme heat', 'Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=1.0000, conf=1.0000, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.0735, conf=0.6199, factors=['Normal conditions']
+[OK] Risk Model: score=0.0762, conf=0.6116, factors=['Normal conditions']
+[OK] Risk Model: score=1.0000, conf=1.0000, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+  ✓ Case 10: temp= 55°C, rain=200mm → score=1.0000
+[OK] Risk Model: score=0.2337, conf=0.3710, factors=['Moderate rainfall', 'Moderate winds']
+[OK] Risk Model: score=0.2673, conf=0.3712, factors=['Normal conditions']
+[OK] Risk Model: score=0.0946, conf=0.5586, factors=['Normal conditions']
+[OK] Risk Model: score=0.0130, conf=0.8906, factors=['Normal conditions']
+[OK] Risk Model: score=0.4462, conf=0.2667, factors=['High temperature', 'Moderate rainfall', 'Moderate winds']
+  ✓ Case 15: temp= 42°C, rain= 80mm → score=0.4462
+[OK] Risk Model: score=0.1682, conf=0.4187, factors=['Normal conditions']
+[OK] Risk Model: score=0.2289, conf=0.3723, factors=['Moderate rainfall', 'High humidity', 'Moderate winds']
+[OK] Risk Model: score=1.0000, conf=1.0000, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+[OK] Risk Model: score=0.1692, conf=0.4174, factors=['Normal conditions']
+[OK] Risk Model: score=0.1980, conf=0.3889, factors=['High temperature']
+  ✓ Case 20: temp= 40°C, rain= 10mm → score=0.1980
+[OK] Risk Model: score=0.1529, conf=0.4396, factors=['Normal conditions']
+[OK] Risk Model: score=0.2551, conf=0.3693, factors=['Normal conditions']
+[OK] Risk Model: score=0.1686, conf=0.4182, factors=['Normal conditions']
+[OK] Risk Model: score=0.0413, conf=0.7406, factors=['Normal conditions']
+[OK] Risk Model: score=0.8212, conf=0.4065, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+  ✓ Case 25: temp= 48°C, rain=120mm → score=0.8212
+[OK] Risk model PASSED: min=0.0130, max=1.0000, mean=0.3037, std=0.3136
+
+[MONEY] Testing Income Model (25 cases)...
+[OK] Income model loaded from G:\gigshield phase 2 Static ML\gigshield-ai\config\..\models\income_model.pkl
+[MONEY] Income Model expects: ['orders_per_day', 'working_hours', 'hourly_income', 'Temperature', 'Rainfall_mm', 'Humidity', 'Wind_Speed', 'Severity']
+[OK] Income loss: 1h × ₹50 → ₹100.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 2h × ₹100 → ₹400.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 4h × ₹75 → ₹600.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 8h × ₹150 → ₹2400.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 0.5h × ₹200 → ₹200.00 (mult=2.00, conf=0.61)
+  ✓ Case  5: 0.5h lost at ₹200/h → loss=₹200.00
+[OK] Income loss: 6h × ₹60 → ₹720.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 3h × ₹120 → ₹720.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 5h × ₹90 → ₹900.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 10h × ₹80 → ₹1600.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 1h × ₹30 → ₹60.00 (mult=2.00, conf=0.61)
+  ✓ Case 10: 1.0h lost at ₹ 30/h → loss=₹60.00
+[OK] Income loss: 2h × ₹250 → ₹1000.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 4h × ₹40 → ₹320.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 7h × ₹110 → ₹1540.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 0.5h × ₹50 → ₹50.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 6h × ₹200 → ₹2400.00 (mult=2.00, conf=0.61)
+  ✓ Case 15: 6.0h lost at ₹200/h → loss=₹2400.00
+[OK] Income loss: 3h × ₹45 → ₹270.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 8h × ₹95 → ₹1520.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 2h × ₹70 → ₹280.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 5h × ₹140 → ₹1400.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 4h × ₹110 → ₹880.00 (mult=2.00, conf=0.61)
+  ✓ Case 20: 4.0h lost at ₹110/h → loss=₹880.00
+[OK] Income loss: 1h × ₹150 → ₹300.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 3h × ₹80 → ₹480.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 6h × ₹130 → ₹1560.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 2h × ₹115 → ₹460.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 5h × ₹130 → ₹1300.00 (mult=2.00, conf=0.61)
+  ✓ Case 25: 5.0h lost at ₹130/h → loss=₹1300.00
+[OK] Income model PASSED: min=₹50.00, max=₹2400.00, mean=₹858.40, std=₹675.49
+
+======================================================================
+[OK] [OK] [OK] ALL MODELS VALIDATED SUCCESSFULLY [OK] [OK] [OK]
+======================================================================
+
+--- 4. STRESS TEST ---
+
+======================================================================
+[LOAD] STRESS TESTING - Extreme Conditions & Edge Cases
+======================================================================
+
+[TEMP] Extreme Weather Conditions
+[OK] Risk Model: score=1.0000, conf=1.0000, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+  [OK] PASS: Severe heat + flooding → Score: 1.0000
+[OK] Risk Model: score=0.0586, conf=0.6711, factors=['Normal conditions']
+  [OK] PASS: Extreme cold + dry → Score: 0.0586
+[OK] Risk Model: score=0.8806, conf=0.4996, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+  [OK] PASS: Heatwave + heavy rain → Score: 0.8806
+[OK] Risk Model: score=0.2289, conf=0.3723, factors=['Moderate rainfall', 'High humidity', 'Moderate winds']
+  [OK] PASS: Cool + heavy rain → Score: 0.2289
+
+[EDGE] Edge Cases
+[OK] Risk Model: score=0.0586, conf=0.6711, factors=['Normal conditions']
+  [OK] PASS: Absolute minimum → Score: 0.0586
+[OK] Risk Model: score=0.9873, conf=0.8926, factors=['Extreme heat', 'Heavy rainfall', 'High humidity', 'Strong winds']
+  [OK] PASS: Extreme maximum → Score: 0.9873
+[OK] Risk Model: score=0.0897, conf=0.5717, factors=['Normal conditions']
+  [OK] PASS: Zero rainfall → Score: 0.0897
+[OK] Risk Model: score=1.0000, conf=1.0000, factors=['Extreme heat', 'Heavy rainfall', 'Strong winds']
+  [OK] PASS: Maximum both → Score: 1.0000
+
+[WARN] Invalid Input Recovery
+[ERROR] Risk prediction failed: Temperature -50 out of expected range [0-70]
+  [OK] CAUGHT: Negative temperature → Safely rejected
+[ERROR] Risk prediction failed: Rainfall_mm cannot be negative: -50
+  [OK] CAUGHT: Negative rainfall → Safely rejected
+
+======================================================================
+[OK] ALL STRESS TESTS PASSED - System is robust under extreme inputs
+======================================================================
+
+--- 5. END-TO-END ZERO-TOUCH PIPELINE TEST ---
+[OK] Income loss: 4h × ₹120.0 → ₹960.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 4h × ₹130.0 → ₹1040.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 4h × ₹115.0 → ₹920.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 4h × ₹125.0 → ₹1000.00 (mult=2.00, conf=0.61)
+[OK] Income loss: 4h × ₹135.0 → ₹1080.00 (mult=2.00, conf=0.61)
+PIPELINE RESULT:  {
+  "success": true,
+  "pipeline_status": "Completed",
+  "environmental_check": {
+    "source": "MockWeatherAPI",
+    "timestamp": "2026-04-03T23:40:34.780640",
+    "location": "Bengaluru",
+    "temperature": 30.491762531226982,
+    "rainfall_mm": 117.60127806164834,
+    "aqi": 326.4680313345712,
+    "alerts": []
+  },
+  "disruption_detection": {
+    "success": true,
+    "event_detected": true,
+    "trigger_count": 2,
+    "trigger_conditions": [
+      "Rainfall > 50.0mm (117.60127806164834mm detected)",
+      "AQI > 300 (326.4680313345712 detected)"
+    ],
+    "event_types": [
+      "Heavy Rain",
+      "Severe Pollution"
+    ],
+    "severity": "Medium",
+    "primary_event": "Heavy Rain",
+    "message": "\ud83d\udea8 Event detected: Heavy Rain"
+  },
+  "claims_processed": {
+    "success": true,
+    "timestamp": "2026-04-03T23:40:34.835106",
+    "policies_processed": 5,
+    "claims_created": 5,
+    "payouts_processed": 5,
+    "message": "\u2705 Automated 5 claims from 5 active policies",
+    "results": [
+      {
+        "policy_id": "P3388871e",
+        "worker_id": "W001",
+        "claim_created": true,
+        "claim_id": "CLM7e5f54d9",
+        "claim_status": "Approved",
+        "message": "\u2705 Claim approved: \u20b9960.0 pending payout"
+      },
+      {
+        "policy_id": "Pc9ae7739",
+        "worker_id": "W002",
+        "claim_created": true,
+        "claim_id": "CLM16cb2f41",
+        "claim_status": "Approved",
+        "message": "\u2705 Claim approved: \u20b91040.0 pending payout"
+      },
+      {
+        "policy_id": "Pd82a9944",
+        "worker_id": "W003",
+        "claim_created": true,
+        "claim_id": "CLMa2fb9427",
+        "claim_status": "Approved",
+        "message": "\u2705 Claim approved: \u20b9920.0 pending payout"
+      },
+      {
+        "policy_id": "P99efe80d",
+        "worker_id": "W004",
+        "claim_created": true,
+        "claim_id": "CLM8174573a",
+        "claim_status": "Approved",
+        "message": "\u2705 Claim approved: \u20b91000.0 pending payout"
+      },
+      {
+        "policy_id": "P0a77f754",
+        "worker_id": "W005",
+        "claim_created": true,
+        "claim_id": "CLM7647d105",
+        "claim_status": "Approved",
+        "message": "\u2705 Claim approved: \u20b91080.0 pending payout"
+      }
+    ]
+  },
+  "message": "Disruption detected. Zero-Touch claims triggered."
+}

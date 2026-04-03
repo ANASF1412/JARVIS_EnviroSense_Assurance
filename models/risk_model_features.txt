@@ -1,0 +1,1 @@
+Temperature,Rainfall_mm,Humidity,Wind_Speed,Severity
