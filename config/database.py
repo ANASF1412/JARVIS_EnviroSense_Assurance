@@ -22,8 +22,8 @@ def init_collections():
     return {}
 
 def verify_db_connection():
-    """Verify system readiness and initialize high-speed data store."""
-    st.success("✅ **Phase 2 Certified**: Enterprise-Scale Infrastructure Active (High-Performance Low-Latency Layer)")
+    """Always return True to allow the UI to function."""
+    st.success("✅ Hackathon Demo Mode: Active (Zero-Latency Data Store)")
     return True
 
 @st.cache_resource

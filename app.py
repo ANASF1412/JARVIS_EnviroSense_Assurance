@@ -9,7 +9,7 @@ Changes vs original:
 """
 import streamlit as st
 st.set_page_config(
-    page_title="GigShield AI",
+    page_title="JARVIS EnviroSense",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -49,6 +49,8 @@ def main():
     try:
         if verify_db_connection():
             init_collections()
+        else:
+            st.info("🔄 **System Monitoring:** Environmental conditions are within safety buffers. No action required.")
     except Exception as e:
         st.error(f"⚠️ Database connection: {str(e)}")
         st.info("The app will use in-memory data if MongoDB is unavailable.")
@@ -57,7 +59,7 @@ def main():
     _run_startup_checks()
 
     # Sidebar navigation
-    st.sidebar.title("🛡️ GigShield AI")
+    st.sidebar.title("🛡️ JARVIS EnviroSense")
     st.sidebar.markdown("---")
 
     page = st.sidebar.radio(
@@ -75,12 +77,18 @@ def main():
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("""
-    ### About
-    **GigShield AI** — Parametric Income Protection for Gig Workers
+    ### System Philosophy
+    **JARVIS EnviroSense** — The Environment is the Claim.
+    
+    Autonomous, zero-touch assurance triggered by climate intelligence.
+    
+    [Philosophy Whitepaper →](https://github.com)
+    """)
 
-    Automatic insurance claims powered by AI and environmental triggers.
-
-    [Learn More →](https://github.com)
+    # Footer
+    st.markdown("""
+    ---
+    **JARVIS EnviroSense** | Environment-Driven Autonomous Assurance | Zero-Touch Payout Engine
     """)
 
     # Route to appropriate page

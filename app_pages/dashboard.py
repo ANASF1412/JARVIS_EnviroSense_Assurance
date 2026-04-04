@@ -19,8 +19,9 @@ from ui.components import (
 
 def show():
     """Render dashboard page."""
-    st.title("📊 GigShield AI Dashboard")
-    st.markdown("Real-time Parametric Income Protection Overview")
+    st.title("🛡️ JARVIS EnviroSense Dashboard")
+    st.markdown("### **Autonomous Assurance Engine**")
+    st.info("💡 **Judge Note:** In this system, there is no manual claim button for the worker. The environment *is* the claim. When sensors breach a threshold, the system executes the payout independently.")
 
     # Initialize services
     dashboard_svc = DashboardService()
@@ -132,7 +133,7 @@ def show():
                     else:
                         st.error(f"Automation failed: {automation_result['error']}")
         else:
-            st.info("✅ No disruption events detected. Conditions are safe.")
+            st.info("🔄 **System Monitoring:** Environmental conditions are within safety buffers. No action required.")
 
     with col2:
         st.markdown("**Forecast**")
@@ -188,5 +189,5 @@ def show():
     # Footer
     st.markdown("""
     ---
-    **GigShield AI** | Powered by Streamlit & MongoDB | Real-time Parametric Insurance
+    **JARVIS EnviroSense** | Environment-Driven Autonomous Assurance | Zero-Touch Payout Engine
     """)

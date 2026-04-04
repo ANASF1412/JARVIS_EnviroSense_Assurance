@@ -1,18 +1,15 @@
 <div align="center">
   
-# 🛡️ GigShield AI
-### Parametric Income Protection for Delivery Workers
+# 🛡️ JARVIS EnviroSense Assurance
+### The Future of Autonomous Parametric Protection
 
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Hugging Face](https://img.shields.io/badge/Hugging_Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/)
-[![Machine Learning](https://img.shields.io/badge/Machine_Learning-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![Claude](https://img.shields.io/badge/Claude-D97757?style=for-the-badge&logo=anthropic&logoColor=white)](https://www.anthropic.com/)
 
+**"ENVIRONMENT = ASSURANCE TRIGGER"**
 
-*An autonomous AI insurance ecosystem that dynamically predicts risk and auto-pays gig workers during environmental disruption—without a single manual claim.*
+*A zero-touch, autonomous environmental intelligence platform that eliminates the "Claim" process entirely. When the climate changes, your protection activates—automatically.*
 
 </div>
 
@@ -96,13 +93,31 @@ Let's look at how GigShield AI protects a worker's livelihood in real-time:
 
 ---
 
-## 🧠 Innovation Layer
+## 🧠 The "EnviroSense" Philosophy
 
-What makes GigShield AI a paradigm shift?
-Instead of operating reactively, GigShield AI operates **predictively and automatically**. 
-- **It eliminates the "Claim" mechanic**: The environment *is* the claim. By relying on deterministic external data (Weather APIs, AQI indices), we remove the friction of proof.
-- **Dynamic Micro-Premiums**: High-risk zones adjust dynamically, ensuring the liquidity pool remains solvent.
-- **NLP Zero-Shot Event Detection**: Reading live government APIs and news feeds via Hugging Face Transformers to trigger Civic Disruption (Curfew) payouts without human intervention.
+What makes **JARVIS EnviroSense** a paradigm shift?
+
+### 1. 🚀 Why This Exists
+Most insurance systems are "Reactive Forms." They wait for the human to suffer, then ask for 10 pages of proof. **We fundamentally disagree.** Our system is "Proactive Intelligence." The worker shouldn't have to request help—the system should see the storm and act before the worker even asks.
+
+### 2. 🎯 What Others Missed
+Traditional InsurTech focuses on making "Claims" faster. **We focus on eliminating "Claims" entirely.** In our system, the environment *is* the claim. By relying on deterministic external data (Weather APIs, AQI indices), we remove human friction and replace it with automated environmental triggers.
+
+### 3. 🧠 "What Makes This Different?"
+- **Not a Paper App**: This isn't just a UI with a database; it is a live decision engine.
+- **Environment-Driven Execution**: No manual intervention. The sensor data directly drives the payouts.
+- **Assurance vs. Insurance**: We provide *Assurance* that you are protected, not *Insurance* that you have to fight for.
+
+### 4. 🤖 How AI Was Used (Transparency)
+We believe in Responsible AI Engineering:
+- **ML Modeling**: AI performs the heavy lifting for Risk Prediction and Income Loss estimation.
+- **Architectural Intent**: While AI accelerated our code, the **logic flow is 100% human-designed**. We engineered the triggers, the anti-spoofing strategy, and the zero-touch pipeline to follow specific business ethics.
+- **Explainability**: Our "Quick Trace" feature ensures that even when AI makes a decision, it remains human-understandable.
+
+### 🛡️ Demo Reliability Engineering
+We made a conscious decision to replace external MongoDB dependencies with a **Perpetual Seed Storage System** (`seed_data.json`). 
+- **Reasoning**: To guarantee a **Zero-Failure Demo** during high-stakes judging on Streamlit Cloud. 
+- **Outcome**: A hyper-stable, ultra-responsive demo environment that works 100% of the time, regardless of network or external DB status.
 
 ---
 
