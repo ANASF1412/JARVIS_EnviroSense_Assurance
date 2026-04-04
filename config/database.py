@@ -4,6 +4,9 @@ MongoDB Database Connection & Setup
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from pymongo.errors import ServerSelectionTimeoutError
 import streamlit as st
+import json
+import os
+from dateutil import parser
 from config.settings import MONGODB_URI, DATABASE_NAME
 
 # Singleton pattern for DB connection
@@ -125,6 +128,38 @@ def init_collections():
     audit_col.create_index([("timestamp", DESCENDING)])
 
     print("[OK] All collections initialized with indexes")
+    
+    # ========================================================================
+    # SEED DATA LOADING
+    # ========================================================================
+    # Only seed if workers collection is empty
+    if db["workers"].count_documents({}) == 0:
+        seed_path = os.path.join(os.path.dirname(__file__), "..", "data", "seed_data.json")
+        if os.path.exists(seed_path):
+            try:
+                with open(seed_path, "r") as f:
+                    seed_data = json.load(f)
+                
+                print(f"🌱 Empty database detected. Seeding data from {seed_path}...")
+                
+                for collab_name, docs in seed_data.items():
+                    if docs and collab_name in ["workers", "policies", "claims", "payouts", "zones"]:
+                        # Convert ISO date strings back to datetime objects
+                        for doc in docs:
+                            for key, value in doc.items():
+                                if isinstance(value, str) and (key.endswith("_at") or key.endswith("_date") or key == "timestamp"):
+                                    try:
+                                        doc[key] = parser.parse(value)
+                                    except:
+                                        pass
+                        
+                        db[collab_name].insert_many(docs)
+                        print(f"✅ Instrumented {len(docs)} documents into '{collab_name}'")
+                
+                st.info("💡 Demo data pre-loaded from seed file.")
+            except Exception as e:
+                print(f"❌ Error seeding data: {e}")
+                
     return db
 
 
