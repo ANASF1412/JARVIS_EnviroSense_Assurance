@@ -5,14 +5,15 @@ Integrates with all GigShield AI modules for real data-grounded answers.
 """
 
 import streamlit as st
-from services.chatbot_service import GigShieldChatbot
+from services.chatbot_service import EnviroSenseChatbot
 from services.repositories.worker_repository import WorkerRepository
 
 
 def show():
     """Render the AI Assistant chatbot page."""
-    st.title("💬 GigShield AI Assistant")
-    st.markdown("Ask anything about your policies, claims, risk scores, or premiums.")
+    st.title("💬 JARVIS EnviroSense Assistant")
+    st.markdown("### **Intelligent Assurance Advisor**")
+    st.caption("No claims. No requests. No waiting. Just automatic assurance.")
 
     # ── Initialise session state ──────────────────────────────────────────────
     if "chat_history" not in st.session_state:
@@ -20,14 +21,16 @@ def show():
     if "chat_context" not in st.session_state:
         st.session_state.chat_context = None
     if "chatbot" not in st.session_state:
-        st.session_state.chatbot = GigShieldChatbot()
+        st.session_state.chatbot = EnviroSenseChatbot()
 
-    chatbot: GigShieldChatbot = st.session_state.chatbot
+    chatbot: EnviroSenseChatbot = st.session_state.chatbot
 
     # ── Sidebar: context config ───────────────────────────────────────────────
     with st.sidebar:
-        st.markdown("---")
-        st.subheader("🎛️ Assistant Context")
+        st.markdown("""
+        ---
+        **JARVIS EnviroSense Assurance** | Zero-Touch Autonomous Protection
+        """)
 
         # Worker selector
         try:
@@ -168,7 +171,6 @@ def show():
     # ── Footer ────────────────────────────────────────────────────────────────
     st.markdown("---")
     st.caption(
-        "🛡️ GigShield AI Assistant | Powered by Claude | "
+        "🛡️ JARVIS EnviroSense Assistant | Powered by Claude | "
         "Answers are based on live data from your account and real ML predictions. "
-        "Set `ANTHROPIC_API_KEY` in your `.env` file to enable."
     )

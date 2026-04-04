@@ -49,15 +49,15 @@ def _get_client() -> anthropic.Anthropic:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-class GigShieldChatbot:
+class EnviroSenseChatbot:
     """
-    Context-aware AI assistant for GigShield AI.
+    Context-aware AI assistant for JARVIS EnviroSense Assurance.
 
     Behaves as:
-      ✔ Insurance advisor    — explains policy terms, premium logic
+      ✔ Assurance advisor    — explains policy terms, premium logic
       ✔ Risk analyst         — explains risk scores and what drives them
-      ✔ Claims assistant     — explains claim status, pipeline steps, decisions
-      ✔ Fraud explainer      — describes why a claim was flagged
+      ✔ System explainer     — explains autonomous trigger logic and decisions
+      ✔ Fraud analyst        — describes why a trigger was flagged
     """
 
     MODEL = "claude-sonnet-4-20250514"
@@ -247,19 +247,28 @@ class GigShieldChatbot:
             "\n⚠️ DATABASE UNAVAILABLE: Live worker/policy/claim data cannot be retrieved. " \
             "Inform the user if they ask about specific records.\n"
 
-        return f"""You are GigShield AI Assistant — an expert insurance advisor, risk analyst, and claims assistant for the GigShield AI platform, which provides parametric income protection insurance for gig workers (delivery agents, drivers, freelancers) against weather and environmental disruptions.
+        return f"""You are JARVIS EnviroSense Assistant — an expert autonomous assurance advisor for the JARVIS EnviroSense Assurance platform. 
 
-IMPORTANT RULES YOU MUST FOLLOW:
-1. ONLY state facts that are present in the LIVE DATA sections below. Do not invent claim IDs, amounts, dates, or status values.
-2. If data is missing or unavailable, say so clearly — never guess or fabricate.
-3. Always explain the REASONING behind risk scores, premium levels, and claim decisions — not just the raw numbers.
-4. Be concise but thorough. Use bullet points and ₹ symbols for Indian currency.
-5. If asked about something outside your data, say what you know and offer to help with what you can.
-6. You understand the full claims pipeline: Event Detection → Claim Initiation → Eligibility Validation → Fraud Detection (Isolation Forest) → Loss Estimation (ML regression) → Approval → Payout.
-7. Fraud detection uses Isolation Forest anomaly detection + GPS movement checks + repeated claims pattern analysis. Explain this clearly when asked.
-8. Premiums have 3 tiers: Low risk (<0.3 score) = ₹20/week, Medium (0.3–0.7) = ₹30/week, High (>0.7) = ₹45/week.
-9. Parametric triggers: Rainfall > 50mm (Heavy Rain), Temperature > 42°C (Heatwave), AQI > 300 (Severe Pollution).
-{db_warning}
+## CORE PHILOSOPHY
+- **Environment = Assurance Trigger**: This system removes the traditional claim process. Environmental signals directly activate protection.
+- **Zero-Touch**: Users don't request help — the system acts automatically.
+- **No Claims, No Requests, No Waiting**: Payouts are triggered by sensors breaching threshold, not by worker filings.
+
+## OPERATIONAL DOMAIN
+You only answer questions about:
+1. Risk Assessment (how risk scores are calculated from Temperature, Rain, AQI)
+2. Premium Logic (₹20-₹45/week based on 3-tier risk)
+3. Autonomous Triggers (Heavy Rain >50mm, Heatwave >42C, Pollution >300 AQI)
+4. Fraud Detection (Isolation Forest anomaly checks)
+5. System Architecture (how environmental sensors drive payouts)
+
+## RESPONSE RULES
+1. If the user asks about anything OUTSIDE these 5 topics (e.g., jokes, general news, other apps), politely state: "I am specialized in JARVIS EnviroSense Assurance logic and can only assist with risk, premiums, and system triggers."
+2. ONLY state facts that are present in the LIVE DATA sections below. 
+3. Never fabricate IDs or amounts.
+4. Use bullet points and ₹ symbols for Indian currency.
+5. Explain the REASONING behind risk scores and premium levels.
+
 ---
 {worker_section}
 {policy_section}

@@ -1,5 +1,5 @@
 """
-GigShield AI - Configuration Settings
+JARVIS EnviroSense Assurance — Main Streamlit Application Entry Point
 """
 import os
 import urllib.parse
@@ -38,7 +38,7 @@ def get_safe_mongodb_uri():
     return uri
 
 MONGODB_URI = get_safe_mongodb_uri()
-DATABASE_NAME = os.getenv("DATABASE_NAME", "gigshield-ai")
+DATABASE_NAME = os.getenv("DATABASE_NAME", "envirosense-assurance")
 
 # ============================================================================
 # ML MODEL PATHS
@@ -122,13 +122,13 @@ DEFAULT_ZONES = [
 # LOGGING CONFIGURATION
 # ============================================================================
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-LOG_FILE = os.getenv("LOG_FILE", "logs/gigshield.log")
+LOG_FILE = os.getenv("LOG_FILE", "logs/envirosense.log")
 
 # ============================================================================
 # STREAMLIT CONFIGURATION
 # ============================================================================
 STREAMLIT_PAGE_CONFIG = {
-    "page_title": "GigShield AI",
+    "page_title": "JARVIS EnviroSense",
     "page_icon": "🛡️",
     "layout": "wide",
     "initial_sidebar_state": "expanded",
