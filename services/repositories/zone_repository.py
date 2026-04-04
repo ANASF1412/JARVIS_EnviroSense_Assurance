@@ -112,34 +112,17 @@ class ZoneRepository(BaseRepository):
         else:
             return "High"
 
-    def get_high_risk_zones(self) -> List[Dict[str, Any]]:
-        """
-        Get all high-risk zones.
-
-        Returns:
-            List of zones with risk > 0.66
-        """
-        return self.find_many({"historical_risk_score": {"$gt": 0.66}})
+    def get_low_risk_zones(self) -> List[Dict[str, Any]]:
+        """Get low risk zones (Memory Safe)."""
+        return [z for z in self.get_all_zones() if float(z.get("historical_risk_score", 0)) < 0.33]
 
     def get_medium_risk_zones(self) -> List[Dict[str, Any]]:
-        """
-        Get all medium-risk zones.
+        """Get mid risk zones (Memory Safe)."""
+        return [z for z in self.get_all_zones() if 0.33 <= float(z.get("historical_risk_score", 0)) <= 0.66]
 
-        Returns:
-            List of zones with risk 0.33-0.66
-        """
-        return self.find_many({
-            "historical_risk_score": {"$gte": 0.33, "$lte": 0.66}
-        })
-
-    def get_low_risk_zones(self) -> List[Dict[str, Any]]:
-        """
-        Get all low-risk zones.
-
-        Returns:
-            List of zones with risk < 0.33
-        """
-        return self.find_many({"historical_risk_score": {"$lt": 0.33}})
+    def get_high_risk_zones(self) -> List[Dict[str, Any]]:
+        """Get high risk zones (Memory Safe)."""
+        return [z for z in self.get_all_zones() if float(z.get("historical_risk_score", 0)) > 0.66]
 
     def delete_zone(self, zone_name: str) -> bool:
         """
@@ -166,36 +149,29 @@ class ZoneRepository(BaseRepository):
         return self.exists({"zone_name": zone_name})
 
     def get_zone_stats(self) -> Dict[str, Any]:
-        """
-        Get zone statistics.
-
-        Returns:
-            Statistics dictionary
-        """
-        pipeline = [
-            {
-                "$group": {
-                    "_id": None,
-                    "total_zones": {"$sum": 1},
-                    "avg_risk": {"$avg": "$historical_risk_score"},
-                    "max_risk": {"$max": "$historical_risk_score"},
-                    "min_risk": {"$min": "$historical_risk_score"},
-                }
-            }
-        ]
-
-        result = self.aggregate(pipeline)
-        if result:
-            stats = result[0]
-            stats.pop("_id", None)
-            return stats
-
+        """Get zone statistics using memory logic."""
+        zones = self.get_all_zones()
+        if not zones:
+            return {"total_zones": 0, "avg_risk": 0.0, "max_risk": 0.0, "min_risk": 0.0}
+            
+        risk_scores = [float(z.get("historical_risk_score", 0)) for z in zones]
         return {
-            "total_zones": 0,
-            "avg_risk": 0.0,
-            "max_risk": 0.0,
-            "min_risk": 0.0,
+            "total_zones": len(zones),
+            "avg_risk": sum(risk_scores) / len(risk_scores),
+            "max_risk": max(risk_scores),
+            "min_risk": min(risk_scores),
         }
+
+    def reset_to_defaults(self, default_zones: List[Dict]):
+        """Wipe all zones and restore from defaults (Memory Store)."""
+        st.session_state.db_storage["zones"] = []
+        for zone_data in default_zones:
+            self.create_zone(
+                zone_data["zone_name"],
+                zone_data["city"],
+                zone_data["historical_risk_score"]
+            )
+        self._save_to_disk()
 
     def get_zones_by_risk_level(self, level: str) -> List[Dict[str, Any]]:
         """

@@ -52,13 +52,7 @@ def show():
             st.markdown("**Initialize Defaults**")
             if st.button("🔄 Reset to Defaults", use_container_width=True):
                 try:
-                    zone_repo.db.zones.delete_many({})
-                    for zone_data in DEFAULT_ZONES:
-                        zone_repo.create_zone(
-                            zone_data["zone_name"],
-                            zone_data["city"],
-                            zone_data["historical_risk_score"]
-                        )
+                    zone_repo.reset_to_defaults(DEFAULT_ZONES)
                     st.success("✅ Zones reset to defaults")
                 except Exception as e:
                     st.error(f"❌ Error: {str(e)}")
