@@ -1,32 +1,153 @@
 """
-Standalone DB Controller - Dummy Connection Handler for Hackathon Demo
-This ensures the app never crashes due to MongoDB connection errors.
+MongoDB Database Connection & Setup
 """
+from pymongo import MongoClient, ASCENDING, DESCENDING
+from pymongo.errors import ServerSelectionTimeoutError
 import streamlit as st
+from config.settings import MONGODB_URI, DATABASE_NAME
+
+# Singleton pattern for DB connection
+_db_client = None
+_database = None
+
 
 def get_db_client():
-    """Dummy client."""
-    return None
+    """Get or create MongoDB client connection."""
+    global _db_client
+    if _db_client is None:
+        try:
+            _db_client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
+            # Test connection
+            _db_client.admin.command("ping")
+        except ServerSelectionTimeoutError:
+            print(f"ERROR: Could not connect to MongoDB at {MONGODB_URI}")
+            raise
+    return _db_client
+
 
 def get_database():
-    """Dummy database context."""
-    return {}
+    """Get database instance."""
+    global _database
+    if _database is None:
+        client = get_db_client()
+        _database = client[DATABASE_NAME]
+    return _database
+
 
 def close_db_connection():
-    """Dummy close."""
-    pass
+    """Close MongoDB connection."""
+    global _db_client, _database
+    if _db_client is not None:
+        _db_client.close()
+        _db_client = None
+        _database = None
+
 
 def init_collections():
-    """Initial collections - no-op for memory repo."""
-    print("[OK] Session-State Collections Initialized (No External DB Needed)")
-    return {}
+    """Initialize database collections with proper indexes."""
+    db = get_database()
+
+    # ========================================================================
+    # WORKERS COLLECTION
+    # ========================================================================
+    if "workers" not in db.list_collection_names():
+        db.create_collection("workers")
+
+    workers_col = db["workers"]
+    workers_col.create_index("worker_id", unique=True)
+    workers_col.create_index("city")
+    workers_col.create_index("delivery_zone")
+    workers_col.create_index("created_at", background=True)
+
+    # ========================================================================
+    # POLICIES COLLECTION
+    # ========================================================================
+    if "policies" not in db.list_collection_names():
+        db.create_collection("policies")
+
+    policies_col = db["policies"]
+    policies_col.create_index("policy_id", unique=True)
+    policies_col.create_index("worker_id")
+    policies_col.create_index("active_status")
+    policies_col.create_index("start_date")
+    policies_col.create_index("end_date")
+    policies_col.create_index([("worker_id", ASCENDING), ("active_status", ASCENDING)])
+
+    # ========================================================================
+    # CLAIMS COLLECTION
+    # ========================================================================
+    if "claims" not in db.list_collection_names():
+        db.create_collection("claims")
+
+    claims_col = db["claims"]
+    claims_col.create_index("claim_id", unique=True)
+    claims_col.create_index("worker_id")
+    claims_col.create_index("policy_id")
+    claims_col.create_index("claim_status")
+    claims_col.create_index("created_at")
+    claims_col.create_index([("worker_id", ASCENDING), ("created_at", DESCENDING)])
+    claims_col.create_index([("claim_status", ASCENDING), ("created_at", DESCENDING)])
+
+    # ========================================================================
+    # PAYOUTS COLLECTION
+    # ========================================================================
+    if "payouts" not in db.list_collection_names():
+        db.create_collection("payouts")
+
+    payouts_col = db["payouts"]
+    payouts_col.create_index("payout_id", unique=True)
+    payouts_col.create_index("claim_id")
+    payouts_col.create_index("worker_id")
+    payouts_col.create_index("status")
+    payouts_col.create_index("timestamp")
+    payouts_col.create_index([("worker_id", ASCENDING), ("timestamp", DESCENDING)])
+
+    # ========================================================================
+    # ZONES COLLECTION
+    # ========================================================================
+    if "zones" not in db.list_collection_names():
+        db.create_collection("zones")
+
+    zones_col = db["zones"]
+    zones_col.create_index("zone_name", unique=True)
+    zones_col.create_index("city")
+
+    # ========================================================================
+    # AUDIT LOGS COLLECTION
+    # ========================================================================
+    if "audit_logs" not in db.list_collection_names():
+        db.create_collection("audit_logs")
+
+    audit_col = db["audit_logs"]
+    audit_col.create_index("timestamp")
+    audit_col.create_index("worker_id")
+    audit_col.create_index("operation")
+    audit_col.create_index([("timestamp", DESCENDING)])
+
+    print("[OK] All collections initialized with indexes")
+    return db
+
 
 def verify_db_connection():
-    """Always return True to allow the UI to function."""
-    st.success("✅ Hackathon Demo Mode: Active (Zero-Latency Data Store)")
-    return True
+    """Verify database connection and initialize collections."""
+    try:
+        client = get_db_client()
+        db = get_database()
 
+        # Ping to verify connection
+        client.admin.command("ping")
+        st.success("✅ MongoDB connection successful")
+
+        # Initialize collections
+        init_collections()
+        return True
+    except Exception as e:
+        st.error(f"❌ Database connection failed: {str(e)}")
+        return False
+
+
+# Cache the connection using Streamlit's cache
 @st.cache_resource
 def get_db_connection():
-    """Cached connection mockup."""
-    return {}
+    """Cached database connection for Streamlit."""
+    return get_database()
