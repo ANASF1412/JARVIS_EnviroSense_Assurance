@@ -16,9 +16,14 @@ from services.environmental_api import EnvironmentalAPI
 from ui.theme import apply_custom_theme
 
 # ── AUTO-MONITORING (PHASE 2) ────────────────────────────────────────────────
+@st.cache_resource
+def get_monitoring_scheduler():
+    scheduler = MonitoringScheduler()
+    scheduler.start()
+    return scheduler
+
 # Start the background monitoring scheduler (Singleton instance)
-scheduler = MonitoringScheduler()
-scheduler.start()
+scheduler = get_monitoring_scheduler()
 
 # Page Configuration
 st.set_page_config(

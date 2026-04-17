@@ -992,7 +992,7 @@ Please visit our [Contributing Guidelines](./CONTRIBUTING.md) or open an issue/P
 ## 📊 Project Pitch Deck
 
 <p align="center">
-  <a href="https://drive.google.com/file/u/0/d/19wqelAtLsf-qekY9n2Zu1rXjR3C5xdNh/view?usp=sharing&pli=1" target="_blank">
+  <a href="https://drive.google.com/file/d/19wqelAtLsf-qekY9n2Zu1rXjR3C5xdNh/view?usp=sharing" target="_blank">
     🚀 <b>Click here to view our Final Presentation</b>
   </a>
 </p>
