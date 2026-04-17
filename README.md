@@ -989,6 +989,13 @@ Please visit our [Contributing Guidelines](./CONTRIBUTING.md) or open an issue/P
 - 🐙 **GitHub**: [JARVIS-EnviroSense-Assurance](https://github.com/ANASF1412/JARVIS-EnviroSense-Assurance)
 
 ---
+## 📊 Project Pitch Deck
+
+<p align="center">
+  <a href="https://drive.google.com/drive/folders/1ZT-qIUL16WDRiMFAqE2vBuLcWy9dqm9G?usp=drive_link" target="_blank">
+    🚀 <b>Click here to view our Final Presentation</b>
+  </a>
+</p>
 
 ## 📄 License & Attribution
 
