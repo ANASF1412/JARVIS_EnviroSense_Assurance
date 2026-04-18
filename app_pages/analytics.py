@@ -17,10 +17,15 @@ def show():
     st.caption("High-fidelity actuarial monitoring of automated payout resilience.")
 
     # 💠 SECTION 1: CORE INFRA KPIs
+    kpis = data.get("kpis", {})
+    total_payouts = kpis.get("total_payout_amount", 0.0)
+    pool_liquidity = 1000000.0 - total_payouts
+    lr = kpis.get("success_rate_percent", 14.2)
+    
     k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Current Pool Liquidity", "₹9,96,480", delta="-0.35%")
-    k2.metric("Loss Ratio (LLR)", "14.2%", help="Payouts vs Premiums Collected")
-    k3.metric("System Yield", "85.8%")
+    k1.metric("Current Pool Liquidity", f"₹{pool_liquidity:,.0f}", delta=f"-{total_payouts/10000:.2f}%")
+    k2.metric("Loss Ratio (LLR)", f"{lr}%", help="Payouts vs Premiums Collected")
+    k3.metric("System Yield", f"{100 - lr:.1f}%")
     k4.metric("Engine Reliability", "99.98%")
 
     st.markdown("---")

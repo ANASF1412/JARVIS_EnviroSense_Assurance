@@ -1,5 +1,6 @@
 """
 JARVIS EnviroSense Assurance — Router (Phase 3 Final Polish)
+# RE-INITIALIZING REPOSITORIES: Supabase Fallback Patch Applied.
 """
 import streamlit as st
 import time
@@ -82,23 +83,31 @@ if time.time() - st.session_state.get("last_fetch", 0) > 30:
 # ── ROUTING LOGIC ─────────────────────────────────────────────────────────────
 def main():
     render_topbar()
+    dashboard_svc = DashboardService()
     
     if st.session_state.role is None:
         from app_pages.login import show
         show()
         return
 
-    # ── WORKER DATA INITIALIZATION ───────────────────────────────────────────
-    if st.session_state.role == "worker" and "user" not in st.session_state:
-        svc = DashboardService()
-        worker_data = svc.get_worker_dashboard(st.session_state.worker_id)
+    # ── 2. LOGIN REDIRECTS (PHASE 1 FIX) ───────────────────────────────────
+    if st.session_state.role == "worker" and st.session_state.worker_id:
+        worker_data = dashboard_svc.get_worker_dashboard_data(st.session_state.worker_id)
+        
         if worker_data.get("success"):
             st.session_state.user = worker_data["worker"]
             st.session_state.data = worker_data
         else:
-            st.error(f"Failed to load worker data: {worker_data.get('error')}")
-            st.session_state.role = None
-            st.rerun()
+            st.error(f"❌ Critical Error: Could not load data for worker {st.session_state.worker_id}")
+            st.warning("Possible causes: Data schema mismatch or Supabase connectivity issues.")
+            c1, c2 = st.columns(2)
+            if c1.button("Retry Load", use_container_width=True):
+                st.rerun()
+            if c2.button("Back to Login", use_container_width=True):
+                st.session_state.role = None
+                st.session_state.worker_id = None
+                st.rerun()
+            st.stop()
 
     # Sidebar Navigation
     st.sidebar.title("🛡️ JARVIS EnviroSense")

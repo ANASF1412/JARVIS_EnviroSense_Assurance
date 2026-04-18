@@ -107,9 +107,9 @@ class AutomationEngine:
         """Estimate payout based on worker profile + zone risk."""
         base_loss = 400.0
         try:
-            worker = self.worker_repo.get_by_id(worker_id, id_field="worker_id")
+            worker = self.worker_repo.get_worker(worker_id)
             if worker:
-                base_loss = worker.get("hourly_income", 40.0) * 8.0 # Using typical mapping if avg_daily_income is missing, fallback to 400.0
+                base_loss = worker.get("hourly_income", 40.0) * 8.0 
                 if "avg_hourly_income" in worker: base_loss = worker["avg_hourly_income"] * 8.0
         except Exception:
             pass
@@ -143,6 +143,28 @@ class AutomationEngine:
                 recent.append(c)
         return recent
 
+    def pre_loop_fairness_gate(self, active_policies: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        PRE-LOOP FAIRNESS GATE: Assessments pool exposure BEFORE execution.
+        If total potential liability > 40% of pool, triggers SAFE_MODE to prevent insolvency.
+        """
+        total_liability = 0.0
+        for policy in active_policies:
+            w_id = policy["worker_id"]
+            z_id = policy.get("delivery_zone", "South-Zone")
+            z_level = self.compute_zone_risk(z_id)["level"]
+            total_liability += self.estimate_worker_loss(w_id, z_id, z_level)
+            
+        current_pool_balance = float(self.core_payout_engine.pool_balance)
+        max_allowed_payout = current_pool_balance * 0.40
+        
+        return {
+            "mass_event_blocked": total_liability > max_allowed_payout,
+            "total_liability": total_liability,
+            "max_allowed": max_allowed_payout,
+            "pool_balance": current_pool_balance
+        }
+
     def simulate_mass_event(self, num_workers=50) -> Dict[str, Any]:
         """MASS SIMULATION ENGINE: Multi-threaded parallel risk stress testing."""
         start_time = time.time()
@@ -163,7 +185,12 @@ class AutomationEngine:
             else:
                 p_res = self.payout_engine.core.process_payout(claim)
                 if p_res.get("success"): payout_total += p_res.get("amount", 0)
-            self.claim_repo.save(claim)
+            
+            # Use appropriate persistence method
+            if self.claim_repo.find_by_id(claim['claim_id'], id_field="claim_id"):
+                self.claim_repo.update_claim(claim['claim_id'], **claim)
+            else:
+                self.claim_repo.create(claim)
         return {"total_processed": num_workers, "blocked_count": blocked_count, "payout_total": payout_total, "execution_time_ms": int((time.time() - start_time) * 1000)}
 
     def trigger_claims_for_event(self, rainfall_mm: float = 0, temperature: float = 0, aqi: float = 0) -> Dict[str, Any]:
@@ -192,17 +219,9 @@ class AutomationEngine:
         target_event_type = "Autonomous Settlement"
         
         # --- PRE-LOOP LIABILITY CALCULATION (FAIRNESS GUARANTEE) ---
-        total_liability = 0.0
-        for policy in active_policies:
-            w_id = policy["worker_id"]
-            z_id = policy.get("delivery_zone", "South-Zone")
-            z_level = self.compute_zone_risk(z_id)["level"]
-            total_liability += self.estimate_worker_loss(w_id, z_id, z_level)
-            
-        current_pool_balance = float(self.core_payout_engine.pool_balance)
-        max_allowed_payout = current_pool_balance * 0.40
-        
-        mass_event_blocked = total_liability > max_allowed_payout
+        fairness_results = self.pre_loop_fairness_gate(active_policies)
+        mass_event_blocked = fairness_results["mass_event_blocked"]
+        total_liability = fairness_results["total_liability"]
         
         anomaly_detected = False
         if rainfall_mm > 150 or aqi > 500:

@@ -21,7 +21,9 @@ def show():
                 workers = {
                     "Ramesh (W001)": "W001",
                     "Arjun (W002)": "W002",
-                    "Priya (W003)": "W003"
+                    "Priya (W003)": "W003",
+                    "Surya (W004)": "W004",
+                    "Karthik (W010)": "W010"
                 }
                 selected_name = st.selectbox("Select Worker Identity", options=list(workers.keys()))
                 

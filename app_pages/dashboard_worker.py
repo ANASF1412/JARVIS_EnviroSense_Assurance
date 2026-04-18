@@ -89,8 +89,8 @@ def show():
         
         with st.container(border=True):
             if status_label in ["ACTIVE", "EXPIRING SOON"]:
-                st.write(f"**Coverage Status:** `<span class='badge badge-{'warning' if status_label == 'EXPIRING SOON' else 'success'}'>{status_label}</span>`", unsafe_allow_html=True)
-                st.write(f"**Policy Node:** `{policy['policy_id']}`")
+                st.markdown(f"**Coverage Status:** <span class='badge badge-{'warning' if status_label == 'EXPIRING SOON' else 'success'}'>{status_label}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Policy Node:** `{policy['policy_id']}`")
                 st.write(f"**Active Window:** {policy['start_date'][:16].replace('T', ' ')} \u2192 **{policy['end_date'][:16].replace('T', ' ')}**")
                 st.write(f"**Weekly Premium:** ₹{policy.get('weekly_premium', 45):,} (Paid via {policy.get('payment_ref', 'Wallet')})")
                 
@@ -109,7 +109,7 @@ def show():
                 else:
                     success_box("System Online", "Monitoring live signals. You are protected.")
             else:
-                st.write("**Coverage Status:** `<span class='badge badge-error'>EXPIRED</span>`", unsafe_allow_html=True)
+                st.markdown(f"**Coverage Status:** <span class='badge badge-error'>EXPIRED</span>", unsafe_allow_html=True)
                 if latest:
                     st.write(f"**Last Active:** Ended {latest['end_date'][:16].replace('T', ' ')}")
                 
@@ -122,7 +122,7 @@ def show():
                     import time
                     ps = PolicyService()
                     with st.spinner("Processing secure mock payment..."):
-                        time.sleep(0.8) # Simulate network
+                        time.sleep(0.4) # Simulate network
                         try:
                             # Safely fetch premium config instead of hardcoding
                             from services.premium_calculator import PremiumCalculator

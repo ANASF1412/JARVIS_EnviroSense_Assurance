@@ -148,8 +148,8 @@ def show():
         income_loss = est_downtime * hourly_wage
         
         if est_downtime > 0:
-            st.markdown(f"**Estimated Downtime:** `{est_downtime} hours`")
-            st.markdown(f"**Expected Income Loss:** `<span style='color:var(--danger);'>₹{income_loss}</span>`", unsafe_allow_html=True)
+            st.markdown(f"**Estimated Downtime:** {est_downtime} hours")
+            st.markdown(f"**Expected Income Loss:** <span style='color:red;font-weight:bold;'>₹{income_loss}</span>", unsafe_allow_html=True)
             st.info("🛡️ **Coverage Readiness:** Active & Monitoring. JARVIS will auto-settle if parametric limits are breached.")
         else:
             st.markdown("**Estimated Downtime:** `0 hours`")

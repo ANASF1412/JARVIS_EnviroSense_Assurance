@@ -42,7 +42,13 @@ def show():
                 h1, h2, h3 = st.columns(3)
                 h1.write(f"**City:** {c.get('city', 'Chennai')}")
                 h2.write(f"**Zone:** {c.get('zone_id', 'South-Zone')}")
-                h3.metric("Decision Confidence", f"{c.get('decision_confidence', 0)}%")
+                dc = c.get('decision_confidence', 85.0)
+                metric_label = "Decision Confidence"
+                if c.get("decision_confidence_source") == "derived":
+                    metric_label = "Decision Confidence (Derived)"
+                
+                h3.metric(metric_label, f"{dc}%")
+
                 
                 st.divider()
 

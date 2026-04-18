@@ -30,6 +30,13 @@
 
 ---
 
+> [!IMPORTANT]
+> **Architecture Note:** The system uses a hybrid Supabase + local cache architecture. If external services fail, the system automatically switches to fallback mode ensuring uninterrupted demo execution.
+
+---
+
+---
+
 ## 🌍 The Problem Statement
 
 Delivery workers serve as the backbone of the urban gig economy, yet they are extremely vulnerable to outdoor conditions. When extreme weather or civic disruptions hit, deliveries halt, resulting in sudden and severe income loss.
@@ -639,6 +646,33 @@ railway up
 # 5. Update Streamlit Cloud env vars with your API endpoint
 # 6. Deploy dashboard to Streamlit Cloud (as Option 3)
 ```
+
+---
+
+### 🔑 Demo Worker IDs & Testing Assets
+
+When running local or cloud demonstrations, use the following Worker IDs in the Worker Dashboard to explore different profiles and data states:
+
+| Worker ID | Name | City | KYC Status | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| **W001** | Ramesh | Chennai | Verified | Healthy history, active policy |
+| **W002** | Arjun | Chennai | Verified | No NCB streak |
+| **W003** | Priya | Delhi | Verified | High rating |
+| **W004** | Surya | Chennai | Verified | High NCB streak |
+| **W010** | Karthik | Mumbai | Verified | Fresh account |
+
+### 🛠️ Important Notes for Judges / Evaluators
+
+*   **Optional External APIs:** `OPENWEATHER_API_KEY`, `AQI_API_KEY`, and `GEMINI_API_KEY` are purely optional. If omitted in local `.env` or Streamlit Secrets, the system intelligently defaults to local failsafe metrics or rule-based chatbots.
+*   **Simulated Razorpay / UPI Payouts:** No real money changes hands during these operations. The application employs sandbox Razorpay simulation routines and `UPI_SIMULATION` fallback handlers to demonstrate the 2-second zero-touch payout flow.
+*   **Failsafe Fallback Cache:** If the Supabase cloud connection isn't configured, the system will use the perpetual JSON pool (`seed_data.json`) ensuring a 100% crash-free demo environment.
+
+### ❓ Troubleshooting & Known Issues
+
+1.  **"Stuck on Loading Dashboard"**: This occurs if your clock is drastically out of sync with the Supabase TLS check, or you are entering a Worker ID that doesn't exist. Clear your Streamlit cache (top right hamburger menu -> Clear Cache) and try **W001** or **W004**.
+2.  **Missing Gemini Chatbot Answers**: Ensure your `GEMINI_API_KEY` is completely valid and has billing active in GCP. If not, it falls back to Rule-Based Mode.
+3.  **UI Elements Look Broken / Markdown Leaking**: Ensure you are using `streamlit>=1.35.0` as stated in `requirements.txt`.
+
 
 ---
 

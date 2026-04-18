@@ -99,13 +99,33 @@ class FraudDetectionEngine:
         ref_zone = (reference_claim or {}).get("zone_id")
         ref_id = (reference_claim or {}).get("claim_id")
         candidates = [c for c in all_claims if c.get("zone_id") == ref_zone] if ref_zone else all_claims
+        
+        # Use localized current time as default
+        now_utc = datetime.now(tz=timezone.utc)
+        
         max_c = []
         for p in candidates:
-            p_ts = _parse_dt(p.get("timestamp", datetime.now(tz=timezone.utc)))
-            p_lat, p_lon = float(p.get("gps", {}).get("lat", 0.0)), float(p.get("gps", {}).get("lon", 0.0))
-            cl = [c["claim_id"] for c in candidates if (p_ts - timedelta(minutes=RING_TIME_WINDOW_MINUTES)) <= _parse_dt(c.get("timestamp")) <= (p_ts + timedelta(minutes=RING_TIME_WINDOW_MINUTES))
-                  and _haversine_km(p_lat, p_lon, float(c.get("gps", {}).get("lat", 0)), float(c.get("gps", {}).get("lon", 0))) <= RING_RADIUS_KM]
+            # Fallback for timestamp field names
+            p_ts_raw = p.get("timestamp") or p.get("created_at") or now_utc
+            p_ts = _parse_dt(p_ts_raw)
+            p_lat = float(p.get("gps", {}).get("lat") or p.get("lat") or 0.0)
+            p_lon = float(p.get("gps", {}).get("lon") or p.get("lon") or 0.0)
+            
+            cl = []
+            for c in candidates:
+                c_ts_raw = c.get("timestamp") or c.get("created_at") or now_utc
+                c_ts = _parse_dt(c_ts_raw)
+                c_lat = float(c.get("gps", {}).get("lat") or c.get("lat") or 0.0)
+                c_lon = float(c.get("gps", {}).get("lon") or c.get("lon") or 0.0)
+                
+                time_match = (p_ts - timedelta(minutes=RING_TIME_WINDOW_MINUTES)) <= c_ts <= (p_ts + timedelta(minutes=RING_TIME_WINDOW_MINUTES))
+                dist_match = _haversine_km(p_lat, p_lon, c_lat, c_lon) <= RING_RADIUS_KM
+                
+                if time_match and dist_match:
+                    cl.append(c.get("claim_id") or str(id(c)))
+            
             if len(cl) > len(max_c): max_c = cl
+            
         if ref_id and ref_id not in max_c: return {"flagged": False, "cluster_size": len(max_c)}
         return {"flagged": len(max_c) >= RING_MIN_CLUSTER_SIZE, "cluster_size": len(max_c)}
 

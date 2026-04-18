@@ -46,8 +46,23 @@
             "_id": "0a18341b-0586-4b47-9492-d5775c039c85"
         },
         {
+            "worker_id": "W004",
+            "name": "Surya",
+            "city": "Chennai",
+            "delivery_zone": "Chennai South",
+            "avg_hourly_income": 48.0,
+            "kyc_status": "Verified",
+            "rating": 4.6,
+            "ncb_streak": 4,
+            "ncb_discount_rate": 0.1,
+            "total_payouts": 0.0,
+            "created_at": "2026-04-17T22:00:22.943292",
+            "updated_at": "2026-04-17T22:00:22.943307",
+            "_id": "0a18341b-0586-4b47-9492-d5775c039c86"
+        },
+        {
             "worker_id": "W010",
-            "name": "Priya Patel",
+            "name": "Karthik",
             "city": "Mumbai",
             "delivery_zone": "Andheri East",
             "avg_hourly_income": 55.0,
@@ -319,6 +334,22 @@
             "created_at": "2026-04-03T22:00:29.850352",
             "updated_at": "2026-04-03T22:00:29.850352",
             "_id": "dd13f7eb-6f06-4209-987e-35337764bdbb"
+        },
+        {
+            "policy_id": "P_MOCK_004",
+            "worker_id": "W004",
+            "weekly_premium": 45.0,
+            "coverage_limit": 5000.0,
+            "start_date": "2026-04-17T22:00:29.850352",
+            "end_date": "2026-04-24T22:00:29.850352",
+            "active_status": true,
+            "payment_ref": "rzp_sub_W004",
+            "payment_status": "SUCCESS",
+            "premium_paid": 45.0,
+            "renewal_count": 0,
+            "created_at": "2026-04-17T22:00:29.850352",
+            "updated_at": "2026-04-17T22:00:29.850352",
+            "_id": "0a18341b-0586-4b47-9492-d5775c039c87"
         },
         {
             "policy_id": "P0f4f2e58",

@@ -35,31 +35,29 @@ class DashboardService:
             today = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
             # Get KPIs
-            total_workers = self.worker_repo.count({})
+            total_workers = len(self.worker_repo.find_all())
             active_policies = self.policy_repo.get_active_policies_count()
 
             # Claims today
-            claims_today = self.claim_repo.count({
+            claims_today = len(self.claim_repo.find_many({
                 "created_at": {"$gte": today}
-            })
+            }))
 
             # Claims this week
-            claims_week = self.claim_repo.count({
+            claims_week = len(self.claim_repo.find_many({
                 "created_at": {"$gte": week_ago}
-            })
+            }))
 
             # Payouts statistics
             payout_stats = self.payout_repo.get_payout_stats()
             total_payout_amount = self.payout_repo.get_total_payout_amount()
 
             # Calculate success rate
-            total_claims_week = self.claim_repo.count({
-                "created_at": {"$gte": week_ago}
-            })
-            paid_claims = self.claim_repo.count({
+            total_claims_week = len(self.claim_repo.find_many({"created_at": {"$gte": week_ago}}))
+            paid_claims = len(self.claim_repo.find_many({
                 "status": "Paid",
                 "created_at": {"$gte": week_ago}
-            })
+            }))
             success_rate = (paid_claims / total_claims_week * 100) if total_claims_week > 0 else 0
 
             # Recent claims
@@ -98,7 +96,7 @@ class DashboardService:
                 "error": f"Dashboard data query failed: {str(e)}"
             }
 
-    def get_worker_dashboard(self, worker_id: str) -> Dict[str, Any]:
+    def get_worker_dashboard_data(self, worker_id: str) -> Dict[str, Any]:
         """
         Get worker-specific dashboard data.
 
@@ -199,23 +197,24 @@ class DashboardService:
 
     def _format_claim(self, claim: Dict) -> Dict:
         """Format claim for display."""
+        ts = claim.get("created_at") or claim.get("timestamp") or datetime.now()
         return {
-            "claim_id": claim["claim_id"],
+            "claim_id": claim.get("claim_id", "Unknown"),
             "claim_status": claim.get('claim_status', claim.get('status', 'Unknown')),
             "status": claim.get('claim_status', claim.get('status', 'Unknown')),
-            "event_type": claim.get("event_type"),
+            "event_type": claim.get("event_type", "General"),
             "estimated_loss": claim.get("estimated_loss", 0),
             "approved_payout": claim.get("approved_payout", 0),
-            "created_at": claim["created_at"].isoformat() if hasattr(claim["created_at"], 'isoformat') else str(claim["created_at"]),
+            "created_at": ts.isoformat() if hasattr(ts, 'isoformat') else str(ts),
         }
 
     def _format_payout(self, payout: Dict) -> Dict:
         """Format payout for display."""
+        ts = payout.get("timestamp") or payout.get("created_at") or datetime.now()
         return {
-            "payout_id": payout["payout_id"],
-            "claim_id": payout["claim_id"],
-            "amount": payout["amount"],
-            "status": payout["status"],
-            "timestamp": payout["timestamp"].isoformat() if hasattr(payout["timestamp"], 'isoformat') else str(
-                payout["timestamp"]),
+            "payout_id": payout.get("payout_id", "Unknown"),
+            "claim_id": payout.get("claim_id", "Unknown"),
+            "amount": payout.get("amount", 0),
+            "status": payout.get("status", "Unknown"),
+            "timestamp": ts.isoformat() if hasattr(ts, 'isoformat') else str(ts),
         }

@@ -82,7 +82,7 @@ class UnifiedPayoutEngine:
             self._processed_ids.add(claim_id)
 
         t_start = time.time()
-        time.sleep(2.0 if delay else 0.4)
+        time.sleep(0.4)
         txn_id = f"rzp_pay_{hashlib.sha256(claim_id.encode()).hexdigest()[:14]}"
         
         with self._lock:

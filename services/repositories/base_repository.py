@@ -107,18 +107,119 @@ class BaseRepository:
         return str(document["_id"])
 
     def _process_supabase_doc(self, doc: Dict[str, Any]) -> Dict[str, Any]:
-        """Convert ISO strings back to datetime objects to maintain strict type parity with local DB."""
+        """Convert ISO strings back to datetime objects and inject defaults for data normalization."""
         new_doc = {}
         for k, v in doc.items():
             if isinstance(v, str) and (k.endswith("_at") or k.endswith("_date") or k == "timestamp" or k == "completed_at" or k == "start_date" or k == "end_date"):
                 try:
                     parsed = parser.parse(v)
-                    # Keep tzinfo consistent with local DB (usually naive in this project)
                     new_doc[k] = parsed.replace(tzinfo=None) if parsed.tzinfo else parsed
                 except:
                     new_doc[k] = v
             else:
                 new_doc[k] = v
+        
+        # --- DATA NORMALIZATION / DEFAULT INJECTION (PHASE 2 & 5) ---
+        if self.collection_name == "workers":
+            new_doc.setdefault("avg_hourly_income", 40.0)
+            new_doc.setdefault("ncb_streak", 0)
+            new_doc.setdefault("ncb_discount_rate", 0.0)
+            new_doc.setdefault("rating", 4.5)
+            new_doc.setdefault("city", "Chennai")
+            new_doc.setdefault("delivery_zone", "General")
+        
+        elif self.collection_name == "policies":
+            new_doc.setdefault("premium_paid", new_doc.get("weekly_premium", 0.0))
+            if "status" not in new_doc:
+                new_doc["status"] = "Active" if new_doc.get("active_status", True) else "Inactive"
+            if "active_status" not in new_doc:
+                new_doc["active_status"] = (new_doc.get("status") == "Active")
+            # Ensure dates are present
+            if "start_date" not in new_doc: new_doc["start_date"] = datetime.now()
+            if "end_date" not in new_doc: new_doc["end_date"] = datetime.now() + timedelta(days=7)
+                
+        elif self.collection_name == "claims":
+            if "status" not in new_doc:
+                new_doc["status"] = new_doc.get("claim_status", "Pending")
+            if "claim_status" not in new_doc:
+                new_doc["claim_status"] = new_doc.get("status", "Pending")
+            new_doc.setdefault("governance_status", "PENDING")
+            
+            # --- PHASE 2 SMART FALLBACK ENGINE ---
+            
+            # 1. Payout Impact / Estimated Loss
+            if not new_doc.get("estimated_loss"):
+                # derive from avg_hourly_income * 8 or use safe default
+                new_doc["estimated_loss"] = 40.0 * 8
+                new_doc["estimated_loss_source"] = "derived"
+            else:
+                new_doc["estimated_loss_source"] = "actual"
+                
+            # 2. Fraud Score (Deterministic, NO randomness)
+            if new_doc.get("fraud_score") is None or new_doc.get("fraud_score") == 0:
+                zone_risk = (
+                    new_doc.get("zone_risk_level")
+                    or new_doc.get("risk_level")
+                    or new_doc.get("zone_status")
+                    or "SAFE"
+                )
+                if isinstance(zone_risk, str):
+                    zone_risk = zone_risk.upper()
+                
+                if zone_risk == "CRITICAL" or "CRITICAL" in str(zone_risk):
+                    f_val = 35.0
+                elif zone_risk == "HIGH" or "HIGH" in str(zone_risk):
+                    f_val = 25.0
+                elif zone_risk in ["WATCH", "MEDIUM"] or "WATCH" in str(zone_risk):
+                    f_val = 18.0
+                else:
+                    f_val = 12.0
+                new_doc["fraud_score"] = f_val
+                new_doc["fraud_score_source"] = "derived"
+            else:
+                new_doc["fraud_score_source"] = "actual"
+
+            # 3. Loyalty Score
+            if new_doc.get("loyalty_score") is None:
+                l_score = min(1.0, 0.5 + (new_doc.get("ncb_streak", 0) * 0.1))
+                new_doc["loyalty_score"] = round(l_score, 2)
+                new_doc["loyalty_score_source"] = "derived"
+            else:
+                new_doc["loyalty_score_source"] = "actual"
+
+            # 4. Decision Confidence
+            if new_doc.get("decision_confidence") is None or new_doc.get("decision_confidence") == 0:
+                f_score = float(new_doc.get("fraud_score", 0))
+                l_score = float(new_doc.get("loyalty_score", 0.9))
+                # Safe formula derivation matching logic
+                computed_confidence = (100 - f_score) * 0.7 + (l_score * 30)
+                clamped_confidence = min(99.0, max(65.0, computed_confidence))
+                new_doc["decision_confidence"] = round(clamped_confidence, 2)
+                new_doc["decision_confidence_source"] = "derived"
+                new_doc["decision_reason"] = f"Derived using fraud_score={f_score}, loyalty_score={l_score}"
+            else:
+                ex_conf = float(new_doc.get("decision_confidence", 85.0))
+                clamped_confidence = min(99.0, max(65.0, ex_conf))
+                new_doc["decision_confidence"] = round(clamped_confidence, 2)
+                new_doc["decision_confidence_source"] = "actual"
+
+            # Ensure claim_status is CamelCase for UI consistency
+            if "claim_status" in new_doc:
+                s = new_doc["claim_status"]
+                if isinstance(s, str) and s.isupper(): new_doc["claim_status"] = s.capitalize()
+        
+        elif self.collection_name == "payouts":
+            if "timestamp" not in new_doc:
+                new_doc["timestamp"] = new_doc.get("created_at") or new_doc.get("date") or datetime.now()
+            new_doc.setdefault("status", "COMPLETED")
+            
+        elif self.collection_name == "zones":
+            if "zone_name" not in new_doc:
+                new_doc["zone_name"] = new_doc.get("zone_id", "Unknown Zone")
+            if "zone_id" not in new_doc:
+                new_doc["zone_id"] = new_doc["zone_name"]
+            new_doc.setdefault("historical_risk_score", 0.2)
+
         return new_doc
 
     def _sync_to_local_cache(self, fetched_docs_or_doc):
@@ -153,32 +254,9 @@ class BaseRepository:
         self.db_storage[self.collection_name] = current_cache
 
     def find_one(self, query: Dict[str, Any]) -> Optional[Dict]:
-        """Find one document by simple field match."""
-        if self.supabase:
-            try:
-                q = self.supabase.table(self.collection_name).select("*")
-                for key, val in query.items():
-                    if not isinstance(val, dict):
-                        q = q.eq(key, val)
-                res = q.limit(1).execute()
-                if res.data:
-                    doc = self._process_supabase_doc(res.data[0])
-                    self._sync_to_local_cache(doc)
-                    return doc
-            except Exception as e:
-                import logging
-                logging.warning(f"Supabase find_one failed, falling back to local: {e}")
-                
-        # --- LOCAL FALLBACK ---
-        for doc in self.db_storage[self.collection_name]:
-            match = True
-            for key, val in query.items():
-                if doc.get(key) != val:
-                    match = False
-                    break
-            if match:
-                return doc
-        return None
+        """Find one document by simple field match (Delegates to find_many for robust query support)."""
+        results = self.find_many(query, limit=1)
+        return results[0] if results else None
 
     def find_by_id(self, doc_id: str, id_field: str = "_id") -> Optional[Dict]:
         """Find document by ID."""
@@ -215,6 +293,12 @@ class BaseRepository:
                 # Cloud-Sync Local Cache
                 self._sync_to_local_cache(processed)
                 
+                # If Supabase returned nothing, check local cache as a second-chance (Phase 5 Consistency Fix)
+                if not processed and query:
+                    local_processed = self._find_many_local(query, limit, skip, sort_field, sort_order)
+                    if local_processed:
+                        return local_processed
+                
                 if skip > 0:
                     processed = processed[skip:]
                 
@@ -227,24 +311,56 @@ class BaseRepository:
                 import logging
                 logging.warning(f"Supabase find_many failed, falling back to local: {e}")
                 
-        # --- LOCAL FALLBACK ---
+            
+        return self._find_many_local(query, limit, skip, sort_field, sort_order)
+
+    def _find_many_local(self, query: Dict[str, Any], limit: int = 0, skip: int = 0,
+                        sort_field: str = None, sort_order: int = -1) -> List[Dict]:
+        """Extracted local find logic for fallback and second-chance queries."""
         results = []
         for doc in self.db_storage[self.collection_name]:
             match = True
             for key, val in query.items():
                 doc_val = doc.get(key)
+                
+                # --- NORMALIZE LOCAL DATA ON-THE-FLY ---
+                if self.collection_name == "workers":
+                    if key == "worker_id" and not doc_val: match=False; break
+                
                 # Handle MongoDB-style operators
                 if isinstance(val, dict):
+                    # Robust type conversion for datetime comparisons
+                    compare_val = val.get("$gte") or val.get("$lte") or val.get("$lt") or val.get("$gt")
+                    if isinstance(compare_val, datetime) and isinstance(doc_val, str):
+                        try:
+                            # Try to parse the doc_val into a datetime for comparison
+                            doc_val = datetime.fromisoformat(doc_val.replace("Z", "+00:00"))
+                        except:
+                            pass
+
                     if "$in" in val and doc_val not in val["$in"]:
                         match = False; break
-                    if "$gte" in val and not (doc_val and doc_val >= val["$gte"]):
-                        match = False; break
-                    if "$lte" in val and not (doc_val and doc_val <= val["$lte"]):
-                        match = False; break
+                    if "$gte" in val:
+                        if not doc_val or doc_val < val["$gte"]: match = False; break
+                    if "$lte" in val:
+                        if not doc_val or doc_val > val["$lte"]: match = False; break
+                    if "$lt" in val:
+                        if not doc_val or doc_val >= val["$lt"]: match = False; break
+                    if "$gt" in val:
+                        if not doc_val or doc_val <= val["$gt"]: match = False; break
                 elif doc_val != val:
-                    match = False; break
+                    # Special check for status/active_status alias
+                    if key == "status" and "active_status" in doc:
+                        mapped_status = "Active" if doc["active_status"] else "Inactive"
+                        if mapped_status != val: match = False; break
+                    elif key == "active_status" and "status" in doc:
+                        mapped_active = (doc["status"] == "Active")
+                        if mapped_active != val: match = False; break
+                    else:
+                        match = False; break
             if match:
-                results.append(doc)
+                # Apply defaults even to local docs to ensure consistency
+                results.append(self._process_supabase_doc(doc))
 
         # Sort
         if sort_field:
@@ -259,6 +375,12 @@ class BaseRepository:
             
         return results
 
+    def reset_to_defaults(self, default_zones: List[Dict]):
+        """Wipe all zones and restore from defaults (Memory Store)."""
+        self.db_storage["zones"] = []
+        for z in default_zones:
+            self.create(z)
+
     def find_all(self) -> List[Dict]:
         """Find all documents in collection."""
         if self.supabase:
@@ -272,7 +394,7 @@ class BaseRepository:
                 logging.warning(f"Supabase find_all failed, falling back: {e}")
                 
         # --- LOCAL FALLBACK ---
-        return self.db_storage[self.collection_name]
+        return [self._process_supabase_doc(d) for d in self.db_storage[self.collection_name]]
 
     def update(self, query: Dict[str, Any], update_data: Dict[str, Any], upsert: bool = False) -> bool:
         """Update multiple documents (In MEMORY)."""

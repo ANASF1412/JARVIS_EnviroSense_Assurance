@@ -61,8 +61,8 @@ def show():
         zones = zone_repo.get_all_zones()
         if zones:
             df = pd.DataFrame([{
-                "Zone": z["zone_name"],
-                "City": z.get("city"),
+                "Zone": z.get("zone_name", z.get("zone_id", "N/A")),
+                "City": z.get("city", "N/A"),
                 "Risk Score": f"{z.get('historical_risk_score', 0):.2f}",
                 "Status": "Active",
             } for z in zones])

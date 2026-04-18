@@ -2,6 +2,7 @@
 GigShield AI — Chatbot Service (Gemini Edition)
 ===============================================
 Production-grade AI assistant that answers InsurTech queries using REAL system data.
+# HOTFIX RELOAD: Ensuring get_smart_suggestions is visible to Streamlit.
 """
 
 import os
@@ -148,7 +149,8 @@ class EnviroSenseChatbot:
         claims_section = ""
         if ctx.get("recent_claims"):
             for c in ctx["recent_claims"]:
-                claims_section += f"- Claim {c.get('claim_id')}: Status={c.get('status', c.get('claim_status'))}, Fraud={c.get('fraud_level')}, Governance={c.get('governance_status')}\n"
+                reason = c.get('decision_reason', 'ML Pattern Match')
+                claims_section += f"- Claim {c.get('claim_id')}: Status={c.get('status', c.get('claim_status'))}, Confidence={c.get('decision_confidence', 'N/A')}%, Reason={reason}, Fraud={c.get('fraud_level')}\n"
         
         prompt = f"""You are JARVIS EnviroSense AI Assistant. Answer questions based on the live system data below. Be simple and explainable.
         
@@ -162,15 +164,26 @@ PREMIUM ESTIMATE: {ctx.get('premium_estimate')}
 """
         return prompt
 
+    def get_smart_suggestions(self, ctx: Dict[str, Any]) -> List[str]:
+        """Generate context-aware suggestions for the user."""
+        suggs = ["Am I covered today?", "How do I earn higher NCB?", "Why is my premium ₹45?"]
+        if ctx.get("recent_claims"):
+            suggs.append("Explain my last claim status")
+        if ctx.get("risk_assessment") and ctx["risk_assessment"].get("risk_score", 0) > 0.5:
+            suggs.append("Why is the risk score high today?")
+        return suggs
+
     def _rule_based_fallback(self, query: str, ctx: Dict[str, Any]) -> str:
         q = query.lower()
-        if "reject" in q or "claim" in q:
+        if "reject" in q or "claim" in q or "confidence" in q:
             if ctx.get("recent_claims"):
                 claims = ctx["recent_claims"]
                 for c in claims:
+                    if "confidence" in q:
+                        return f"Your latest claim {c.get('claim_id')} has a decision confidence of {c.get('decision_confidence', 'N/A')}%. Reason: {c.get('decision_reason', 'Analyzed by System Intelligence')}."
                     if c.get("status") in ["BLOCKED", "FLAGGED", "REVIEW", "REJECTED"]:
-                        return f"Claim {c.get('claim_id')} was routed to {c.get('status')} due to: {c.get('fraud_explanation', 'High Risk Activity/Limits')}."
-                return "Your recent claims appear to be processed or not rejected."
+                        return f"Claim {c.get('claim_id')} was routed to {c.get('status')} due to: {c.get('fraud_explanation', 'High Risk Activity/Limits')}. (Confidence: {c.get('decision_confidence', 'N/A')}%)"
+                return f"Your recent claims appear to be processed. Last claim {claims[0].get('claim_id')} has {claims[0].get('decision_confidence')}% confidence."
             return "You have no recent claims on file."
         elif "risk" in q or "today" in q:
             r = ctx.get("risk_assessment", {})
